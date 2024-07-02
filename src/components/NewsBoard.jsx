@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import NewsItem from './NewsItem';
-import { CiPen } from 'react-icons/ci';
 
 const NewsBoard = ({category}) => {
 
   const [articles, setArticles] = useState([]);
   useEffect(() => {
     const fetchNews = async () => {
-      const apiKey = import.meta.env.VITE_NEWS_API_KEY;
-      const url = `https://newsapi.org/v2/top-headlines?country=IN&category=${category}&apiKey=${apiKey}`;
+      const url = `https://newsapi.org/v2/top-headlines?country=IN&category=${category}&apiKey=5a3f3e17b53949af86b5af8e0d7b4bd0`;
 
       try {
         const response = await fetch(url);
