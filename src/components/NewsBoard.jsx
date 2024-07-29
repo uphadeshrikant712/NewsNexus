@@ -1,23 +1,31 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import NewsItem from "./NewsItem";
+import React, { useEffect, useState } from 'react';
+import NewsItem from './NewsItem';
 
-export const NewsBoard = ({ category }) => {
+const NewsBoard = ({ category }) => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchNews = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        setLoading(true);
         const apiKey = import.meta.env.VITE_NEWS_API_KEY;
-        const url = `https://newsapi.org/v2/top-headlines?country=in&category=${category}&apiKey=${apiKey}`;
-        const response = await axios.get(url);
-        setArticles(response.data.articles);
+        const url = `https://newsapi.org/v2/top-headlines?country=IN&category=${category}&apiKey=${apiKey}`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(`Network response was not ok: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setArticles(data.articles);
       } catch (error) {
-        console.error("Error fetching news:", error);
-        setError(error.response?.data?.message || error.message || "Error fetching news");
+        console.error('Error fetching news:', error);
+        setError(error.message || 'Error fetching news');
       } finally {
         setLoading(false);
       }
@@ -27,31 +35,36 @@ export const NewsBoard = ({ category }) => {
   }, [category]);
 
   if (loading) {
-    return <p className="text-center">Loading...</p>;
+    return <p className="text-white text-center">Loading...</p>;
   }
 
   if (error) {
-    return <p className="text-center text-danger">Error: {error}</p>;
+    return <p className="text-white text-center">Error: {error}</p>;
   }
 
   return (
-    <div>
-      <h2 className="text-center">
-        Latest <span className="badge bg-danger">News</span>
-      </h2>
-      <div className="container">
-        <div className="row">
-          {articles.map((news, index) => (
-            <NewsItem
-              key={index}
-              title={news.title}
-              description={news.description}
-              src={news.urlToImage}
-              url={news.url}
-            />
-          ))}
-        </div>
+    <div className='text-white bg-gradient-to-r from-black via-slate-700 to-black pt-6'>
+      <div className="heading flex items-center justify-center py-2">
+        <h1 className='text-2xl flex text-black font-semibold px-2 bg-gradient-to-r from-pink-600 to-blue-400 font-sriracha'>
+          NewsNexus✨
+        </h1>
       </div>
+
+      <h2 className='flex items-center justify-center text-lg font-grotesk text-center px-2 pb-[2vw]'>
+        Your daily source for unbiased, up-to-the-minute news!
+      </h2>
+
+      {articles.length === 0 && !loading && <p className="text-white text-center">No articles found.</p>}
+
+      {articles.map((news,index) => (
+        <NewsItem
+          key={index}
+          title={news.title}
+          description={news.description}
+          src={news.image}
+          url={news.url}
+        />
+      ))}
     </div>
   );
 };
