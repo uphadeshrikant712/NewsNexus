@@ -10,32 +10,26 @@ const NewsBoard = ({ category }) => {
     const fetchNews = async () => {
       setLoading(true);
       setError(null);
-    
+
       try {
         const apiKey = import.meta.env.VITE_NEWS_API_KEY;
         const url = `https://newsapi.org/v2/top-headlines?country=IN&category=${category}&apiKey=${apiKey}`;
-    
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-    
+
+        const response = await fetch(url);
+
         if (!response.ok) {
-          throw new Error(`Network response was not ok: ${response.statusText}`);
+          throw new Error('Network response was not ok');
         }
-    
+
         const data = await response.json();
         setArticles(data.articles);
       } catch (error) {
-        console.error('Error fetching news:', error);
         setError(error.message || 'Error fetching news');
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchNews();
   }, [category]);
 
@@ -59,7 +53,7 @@ const NewsBoard = ({ category }) => {
         Your daily source for unbiased, up-to-the-minute news!
       </h2>
 
-      {articles.length === 0 && !loading && <p className="text-white text-center">No articles found.</p>}
+      {articles.length === 0 && <p className="text-white text-center">No articles found.</p>}
 
       {articles.map((news) => (
         <NewsItem
