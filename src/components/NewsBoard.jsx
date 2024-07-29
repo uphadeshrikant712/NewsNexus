@@ -1,30 +1,59 @@
-import { useEffect } from "react";
-import { useState } from "react"
-import { NewsItem } from "./NewsItem";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import NewsItem from "./NewsItem";
 
-export const NewsBoard = ({category}) => {
+export const NewsBoard = ({ category }) => {
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    const [articles, setArticles] = useState([]);
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        setLoading(true);
+        const apiKey = import.meta.env.VITE_NEWS_API_KEY;
+        const url = `https://newsapi.org/v2/top-headlines?country=in&category=${category}&apiKey=${apiKey}`;
+        const response = await axios.get(url);
+        setArticles(response.data.articles);
+      } catch (error) {
+        console.error("Error fetching news:", error);
+        setError(error.response?.data?.message || error.message || "Error fetching news");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    useEffect(() => {
-      let url = `https://newsapi.org/v2/top-headlines?country=in&category=${category}&apiKey=${import.meta.env.VITE_API_KEY}`
-        
-      fetch(url).then(response => response.json()).then(data => setArticles(data.articles))
+    fetchNews();
+  }, [category]);
 
-    }, [category])
-    
+  if (loading) {
+    return <p className="text-center">Loading...</p>;
+  }
+
+  if (error) {
+    return <p className="text-center text-danger">Error: {error}</p>;
+  }
 
   return (
     <div>
-
-        <h2 className=" text-center">Latest <span className="badge bg-danger">News</span></h2>
-        <div className="container">
-            <div className="row">
-                {articles.map((news,index)=>{
-                    return <NewsItem key={index} title={news.title} description={news.description} src={news.urlToImage} url={news.url}/>
-                })}
-            </div>
+      <h2 className="text-center">
+        Latest <span className="badge bg-danger">News</span>
+      </h2>
+      <div className="container">
+        <div className="row">
+          {articles.map((news, index) => (
+            <NewsItem
+              key={index}
+              title={news.title}
+              description={news.description}
+              src={news.urlToImage}
+              url={news.url}
+            />
+          ))}
         </div>
+      </div>
     </div>
-  )
-}
+  );
+};
+
+export default NewsBoard;
