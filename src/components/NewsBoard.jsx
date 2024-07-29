@@ -1,71 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import NewsItem from './NewsItem';
+import { useEffect } from "react";
+import { useState } from "react"
+import { NewsItem } from "./NewsItem";
 
-const NewsBoard = ({ category }) => {
-  const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export const NewsBoard = ({category}) => {
 
-  useEffect(() => {
-    const fetchNews = async () => {
-      setLoading(true);
-      setError(null);
+    const [articles, setArticles] = useState([]);
 
-      try {
-        const apiKey = import.meta.env.VITE_NEWS_API_KEY;
-        const url = `https://newsapi.org/v2/top-headlines?country=IN&category=${category}&apiKey=${apiKey}`;
+    useEffect(() => {
+      let url = `https://newsapi.org/v2/top-headlines?country=in&category=${category}&apiKey=${import.meta.env.VITE_API_KEY}`
+        
+      fetch(url).then(response => response.json()).then(data => setArticles(data.articles))
 
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-        setArticles(data.articles);
-      } catch (error) {
-        setError(error.message || 'Error fetching news');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchNews();
-  }, [category]);
-
-  if (loading) {
-    return <p className="text-white text-center">Loading...</p>;
-  }
-
-  if (error) {
-    return <p className="text-white text-center">Error: {error}</p>;
-  }
+    }, [category])
+    
 
   return (
-    <div className='text-white bg-gradient-to-r from-black via-slate-700 to-black pt-6'>
-      <div className="heading flex items-center justify-center py-2">
-        <h1 className='text-2xl flex text-black font-semibold px-2 bg-gradient-to-r from-pink-600 to-blue-400 font-sriracha'>
-          NewsNexus✨
-        </h1>
-      </div>
+    <div>
 
-      <h2 className='flex items-center justify-center text-lg font-grotesk text-center px-2 pb-[2vw]'>
-        Your daily source for unbiased, up-to-the-minute news!
-      </h2>
-
-      {articles.length === 0 && <p className="text-white text-center">No articles found.</p>}
-
-      {articles.map((news) => (
-        <NewsItem
-          key={news.url}
-          title={news.title}
-          description={news.description}
-          src={news.urlToImage}
-          url={news.url}
-        />
-      ))}
+        <h2 className=" text-center">Latest <span className="badge bg-danger">News</span></h2>
+        <div className="container">
+            <div className="row">
+                {articles.map((news,index)=>{
+                    return <NewsItem key={index} title={news.title} description={news.description} src={news.urlToImage} url={news.url}/>
+                })}
+            </div>
+        </div>
     </div>
-  );
-};
-
-export default NewsBoard;
+  )
+}
