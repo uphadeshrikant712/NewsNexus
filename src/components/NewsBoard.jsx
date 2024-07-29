@@ -12,8 +12,8 @@ const NewsBoard = ({ category }) => {
       setError(null);
 
       try {
-        const apiKey = import.meta.env.VITE_NEWS_API_KEY;
-        const url = `https://newsapi.org/v2/top-headlines?country=IN&category=${category}&apiKey=${apiKey}`;
+        // const apiKey = import.meta.env.VITE_NEWS_API_KEY;
+        const url = `https://newsapi.org/v2/top-headlines?country=IN&category=${category}&apiKey=${import.meta.env.VITE_NEWS_API_KEY}`;
 
         const response = await fetch(url);
 
